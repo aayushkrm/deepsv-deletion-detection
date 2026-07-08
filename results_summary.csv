@@ -1,0 +1,16 @@
+experiment,model,regime,F1,F1_sd,AUROC,precision,recall,AUPRC,params,train_s
+Exp1_arch,CNN,human_standard,0.959,0.004,0.995,0.957,0.961,0.995,453249,111.0
+Exp1_arch,Transformer,human_standard,0.918,0.014,0.98,0.908,0.928,0.98,358913,106.0
+Exp2_feat_standard,FeaturesMLP,human_standard,0.712,0.053,0.827,0.8,0.646,0.857,4673,1.0
+Exp2_feat_standard,CNN_image_only,human_standard,0.959,0.004,0.995,0.957,0.961,0.995,453249,111.0
+Exp2_feat_standard,Fusion_CNN+features,human_standard,0.959,0.004,0.995,0.961,0.958,0.995,464769,121.0
+Exp2_feat_hard,FeaturesMLP,human_hard,0.71,0.002,0.767,0.739,0.685,0.806,,
+Exp2_feat_hard,CNN_image_only,human_hard,0.88,0.006,0.941,0.87,0.892,0.945,,
+Exp2_feat_hard,Fusion_CNN+features,human_hard,0.869,0.007,0.943,0.844,0.896,0.95,,
+Exp3_transfer,CNN,human->human,0.956,,0.995,0.942,0.97,0.995,,
+Exp3_transfer,CNN_zero_shot,human->rice,0.963,,0.984,0.981,0.946,0.987,,
+Exp3_transfer,CNN_crop_native,human->rice,0.951,,0.989,0.946,0.955,0.992,,
+Exp3_transfer,CNN_finetuned,human->rice,0.909,,0.982,0.875,0.946,0.986,,
+Exp3_transfer,CNN_zero_shot,human->maize,0.884,,0.953,0.837,0.936,0.956,,
+Exp3_transfer,CNN_crop_native,human->maize,0.922,,0.982,0.935,0.909,0.985,,
+Exp3_transfer,CNN_finetuned,human->maize,0.92,,0.966,0.904,0.936,0.972,,
