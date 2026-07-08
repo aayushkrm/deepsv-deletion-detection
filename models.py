@@ -159,3 +159,56 @@ class FeaturesMLP(nn.Module):
 
 def count_params(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+# ---------------------------------------------------------------------------
+# Efficiency optimization (Exp4): depthwise-separable CNN
+# ---------------------------------------------------------------------------
+class _SepConv(nn.Module):
+    """Depthwise-separable convolution: a depthwise 3x3 (one filter per input
+    channel) followed by a pointwise 1x1 mixing convolution. Replaces a dense
+    3x3 conv at ~1/9 of its multiply-accumulate cost and parameter count while
+    preserving receptive field."""
+    def __init__(self, cin, cout, stride=1):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, 3, stride=stride, padding=1, groups=cin, bias=False)
+        self.pw = nn.Conv2d(cin, cout, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+        self.act = nn.LeakyReLU(0.1, inplace=True)
+
+    def forward(self, x):
+        return self.act(self.bn(self.pw(self.dw(x))))
+
+
+class EfficientDeepSVCNN(nn.Module):
+    """Efficiency-optimized deletion detector.
+
+    Same input tensor and classification target as DeepSVCNN, but the dense
+    3x3 conv stack is replaced by depthwise-separable blocks and downsampling
+    is folded into strided convolutions (no separate maxpool). A single
+    (rather than paired) block per stage and a lighter head cut the parameter
+    count roughly an order of magnitude and speed up both training and,
+    importantly for genome-wide scanning, inference throughput.
+    """
+    def __init__(self, width=24, dropout=0.2):
+        super().__init__()
+        w = width
+        self.stem = nn.Sequential(
+            nn.Conv2d(N_CHANNELS, w, 3, padding=1, bias=False),
+            nn.BatchNorm2d(w), nn.LeakyReLU(0.1, inplace=True),
+        )
+        self.features = nn.Sequential(
+            _SepConv(w, w * 2, stride=2),      # 64x96 -> 32x48
+            _SepConv(w * 2, w * 2),
+            _SepConv(w * 2, w * 4, stride=2),  # -> 16x24
+            _SepConv(w * 4, w * 4),
+            _SepConv(w * 4, w * 4, stride=2),  # -> 8x12
+            nn.Dropout2d(dropout),
+        )
+        self.head = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1), nn.Flatten(),
+            nn.Linear(w * 4, 1),
+        )
+
+    def forward(self, x, feats=None):
+        return self.head(self.features(self.stem(x))).squeeze(-1)

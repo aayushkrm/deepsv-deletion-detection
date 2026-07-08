@@ -14,3 +14,5 @@ Exp3_transfer,CNN_finetuned,human->rice,0.909,,0.982,0.875,0.946,0.986,,
 Exp3_transfer,CNN_zero_shot,human->maize,0.884,,0.953,0.837,0.936,0.956,,
 Exp3_transfer,CNN_crop_native,human->maize,0.922,,0.982,0.935,0.909,0.985,,
 Exp3_transfer,CNN_finetuned,human->maize,0.92,,0.966,0.904,0.936,0.972,,
+Exp4_efficiency,CNN_baseline,human_standard,0.969,0.008,0.995,0.972,0.967,0.995,453249,276.4
+Exp4_efficiency,Efficient_sepconv,human_standard,0.945,0.010,0.991,0.917,0.976,0.988,53793,70.6

@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pt
+!deepsv_efficient.pt
+_tmp.pt
+.DS_Store
+.venv/
+*.log
